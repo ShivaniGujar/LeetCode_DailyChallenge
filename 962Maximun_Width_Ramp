@@ -1,0 +1,56 @@
+######################### PROBLEM STATEMENT ##################################
+A ramp in an integer array nums is a pair (i, j) for which i < j and nums[i] <= nums[j]. The width of such a ramp is j - i.
+
+Given an integer array nums, return the maximum width of a ramp in nums. If there is no ramp in nums, return 0.
+
+ 
+
+Example 1:
+
+Input: nums = [6,0,8,2,1,5]
+Output: 4
+Explanation: The maximum width ramp is achieved at (i, j) = (1, 5): nums[1] = 0 and nums[5] = 5.
+Example 2:
+
+Input: nums = [9,8,1,0,1,9,4,0,4,1]
+Output: 7
+Explanation: The maximum width ramp is achieved at (i, j) = (2, 9): nums[2] = 1 and nums[9] = 1.
+
+
+
+Refer :https://youtu.be/WqomLDmN424?si=mAkNkkXwhjpDCB6V
+
+class Solution {
+    public int maxWidthRamp(int[] nums) {
+        
+        Stack<Integer> stack= new Stack<>();//store index here
+        int n= nums.length;//n is total numbers of elements
+
+        for(int i=0;i<n;i++){
+            // maintain decreasing order
+            if(stack.isEmpty() || nums[stack.peek()]  > nums[i]){
+                stack.push(i);
+            }
+        }
+        int ans=Integer.MIN_VALUE;
+        for(int i=n-1;i>=0;i--){
+            while(!stack.isEmpty() && nums[stack.peek()] <= nums[i]){
+              ans= Math.max(ans, i - stack.pop());
+            }
+            if(stack.isEmpty()){
+                break;
+            }
+        }
+        return ans;
+    }
+}
+
+
+
+Key Concepts:
+Monotonic Stack: A stack that maintains its elements in a specific order (either increasing or decreasing). In this problem, we use a monotonic decreasing stack based on the values of nums.
+
+Two-Pass Approach:
+
+First Pass (Left to Right): Identify potential starting indices i for ramps and store them in a stack.
+Second Pass (Right to Left): For each index j, check if it can form a ramp with any of the stored indices i in the stack.
