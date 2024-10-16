@@ -1,0 +1,146 @@
+1405. Longest Happy String\\
+
+A string s is called happy if it satisfies the following conditions:
+
+s only contains the letters 'a', 'b', and 'c'.
+s does not contain any of "aaa", "bbb", or "ccc" as a substring.
+s contains at most a occurrences of the letter 'a'.
+s contains at most b occurrences of the letter 'b'.
+s contains at most c occurrences of the letter 'c'.
+Given three integers a, b, and c, return the longest possible happy string. 
+If there are multiple longest happy strings, return any of them. If there is no such string, return the empty string "".
+
+A substring is a contiguous sequence of characters within a string.
+
+ 
+
+Example 1:
+
+Input: a = 1, b = 1, c = 7
+Output: "ccaccbcc"
+Explanation: "ccbccacc" would also be a correct answer.
+Example 2:
+
+Input: a = 7, b = 1, c = 0
+Output: "aabaa"
+Explanation: It is the only correct answer in this case.
+ 
+Constraints:
+
+0 <= a, b, c <= 100
+a + b + c > 0
+Intuition
+The problem asks to construct the longest possible string using the letters 'a', 'b', and 'c' such that:
+
+No three consecutive characters are the same.
+The counts of 'a', 'b', and 'c' do not exceed the given values a, b, and c respectively.
+The intuition here is that we should always aim to use the character with the highest count, while ensuring that it does not violate the "no three consecutive characters" rule. A greedy approach works well here because we can construct the string step by step by selecting the most available character, and if adding that character leads to three consecutive letters, we switch to the next most available character.
+
+Approach
+Greedy Strategy: Always try to use the character with the highest remaining count. If that character has been used twice consecutively, switch to the next most frequent character.
+Priority Queue: Use a max-heap (or priority queue) to keep track of the character counts. This ensures that at every step, we can easily pick the character with the highest remaining count.
+Condition Handling: If the character with the highest count has been used twice in a row, we temporarily switch to the second-highest character to avoid three consecutive characters.
+Stop When No Characters Left: The process stops when no more characters can be added without violating the conditions.
+Complexity
+Time complexity:
+O(n) where (n = a + b + c) since each character is processed at most once and we make at most 3 log operations per step (for the heap).
+
+Space complexity:
+O(1) for the priority queue, as we store a maximum of three characters. The result string takes (O(n)), but that is required for the output, so the effective auxiliary space is constant.
+**************************************SOLUTION*******************************
+
+class Solution {
+    public String longestDiverseString(int a, int b, int c) {
+        // Priority queue to store the characters and their counts.
+        PriorityQueue<int[]> pq = new PriorityQueue<>((x, y) -> y[0] - x[0]);
+        if (a > 0) pq.offer(new int[]{a, 'a'});
+        if (b > 0) pq.offer(new int[]{b, 'b'});
+        if (c > 0) pq.offer(new int[]{c, 'c'});
+
+        StringBuilder result = new StringBuilder();
+
+        while (!pq.isEmpty()) {
+            int[] first = pq.poll();
+
+            // Check if last two characters are the same.
+            if (result.length() >= 2 && result.charAt(result.length() - 1) == first[1] &&
+                result.charAt(result.length() - 2) == first[1]) {
+
+                if (pq.isEmpty()) break;  // No more valid characters.
+
+                // Pick the second character.
+                int[] second = pq.poll();
+                result.append((char) second[1]);
+                second[0]--;
+
+                if (second[0] > 0) pq.offer(second);
+                pq.offer(first);
+            } else {
+                result.append((char) first[1]);
+                first[0]--;
+
+                if (first[0] > 0) pq.offer(first);
+            }
+        }
+
+        return result.toString();
+        
+    }
+}
+
+
+
+EXPLANATION:
+1. Using a Priority Queue (Max-Heap)
+The priority queue (PriorityQueue<int[]>) is used to store the available characters (a, b, and c) along with their remaining counts. The priority queue is sorted based on the count of characters in descending order (the character with the highest remaining count is prioritized).
+
+The priority queue stores integer arrays where the first element is the count of a character and the second element is the ASCII value of the character ('a', 'b', or 'c').
+The lambda function (x, y) -> y[0] - x[0] ensures that the priority queue orders elements by their counts in descending order.
+
+2. INITIAL setup
+
+If the count of a, b, or c is greater than zero, it is added to the priority queue.
+For example, if a = 2, b = 3, and c = 1, the queue will contain:
+['b', 3], ['a', 2], ['c', 1]
+
+3. Main Loop
+
+while (!pq.isEmpty()) {
+    int[] first = pq.poll();
+The algorithm runs while there are still characters in the priority queue.
+In each iteration, it picks the character with the highest count (this is done by polling the PriorityQueue).
+
+4. Check for Consecutive Characters
+
+if (result.length() >= 2 && result.charAt(result.length() - 1) == first[1] &&
+    result.charAt(result.length() - 2) == first[1]) {
+Before adding the character with the highest count to the result, it checks if the last two characters in the result are the same as the character you're about to add. This is done to prevent adding three consecutive identical characters.
+
+5. Handling Consecutive Characters
+If the character you're about to add would violate the rule of "no three consecutive characters", the algorithm does the following:
+
+if (pq.isEmpty()) break;  // No more valid characters.
+int[] second = pq.poll();
+result.append((char) second[1]);
+second[0]--;
+if (second[0] > 0) pq.offer(second);
+pq.offer(first);
+
+
+If the highest-priority character would cause three consecutive characters, the algorithm picks the next highest character (second) from the priority queue.
+It adds this second character to the result, decrements its count, and puts it back into the priority queue (if its count is still greater than zero).
+After that, the algorithm puts the previously skipped character (first) back into the queue, so it can be used later when it no longer violates the triplet rule.  
+
+6. Normal Case: Add Character
+
+result.append((char) first[1]);
+first[0]--;
+if (first[0] > 0) pq.offer(first);
+
+
+If adding the highest-priority character doesn't violate the "no three consecutive characters" rule, it's directly added to the result.
+The count of this character is decremented, and if there are still more occurrences left, it is added back into the priority queue.
+7. Return the Result
+After the loop terminates, the result string is converted to a string and returned:
+
+return result.toString();
