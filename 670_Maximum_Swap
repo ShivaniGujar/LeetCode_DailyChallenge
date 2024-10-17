@@ -1,0 +1,111 @@
+You are given an integer num. You can swap two digits at most once to get the maximum valued number.
+
+Return the maximum valued number you can get.
+
+ Example 1:
+
+Input: num = 2736
+Output: 7236
+Explanation: Swap the number 2 and the number 7.
+Example 2:
+
+Input: num = 9973
+Output: 9973
+Explanation: No swap.
+##############  Refer : https://youtu.be/UwqnSOKvwVk?si=-y5JDr91giBrFkKd
+
+############ code
+                                              class Solution {
+                                                  public int maximumSwap(int num) {
+                                                      
+                                                     char numArr[]=  Integer.toString(num).toCharArray();
+                                              
+                                                     int n = numArr.length;
+                                                     char maxElement= numArr[n-1];
+                                                     int maxIndex = n-1;
+                                                     int swapIdx1 = -1;
+                                                     int swapIdx2 = -1;
+                                              
+                                                     for(int i=n-2; i>=0;i--){
+                                              
+                                                      if(numArr[i]> maxElement){
+                                                          maxElement = numArr[i];
+                                                          maxIndex = i;
+                                                      }else if(numArr[i]< maxElement)
+                                                             {
+                                                               swapIdx1 = i;
+                                                              swapIdx2 = maxIndex;
+                                                             }
+                                                     }
+                                              
+                                                      //perform Swap
+                                              
+                                                      if(swapIdx1 !=-1){
+                                                          char temp = numArr [swapIdx1];
+                                                          numArr [swapIdx1] =numArr [swapIdx2];
+                                                          numArr [swapIdx2]= temp; 
+                                                      }
+                                                      return Integer.parseInt(new String(numArr));
+                                                  }
+                                              }
+
+Explanation:
+#### 1. Convert the number into a character array:
+                                              char numArr[] = Integer.toString(num).toCharArray();
+
+The number num is first converted to a string using Integer.toString(num) and then into a character array numArr[] so that individual digits can be easily accessed and modified.
+
+##### 2.Initialization of variables:
+                                            int n = numArr.length;
+                                            char maxElement = numArr[n-1];
+                                            int maxIndex = n-1;
+                                            int swapIdx1 = -1;
+                                            int swapIdx2 = -1;
+
+  n stores the length of the numArr[].
+maxElement is initialized to the last digit (rightmost digit) of the number.
+maxIndex is initialized to the index of maxElement (i.e., n-1 initially).
+swapIdx1 and swapIdx2 are initialized to -1 and will be used to store the indices of the two digits to be swapped.
+
+##### 3. Loop through the number from right to left:
+
+                                                  for(int i=n-2; i>=0;i--){
+                                                      if(numArr[i]> maxElement){
+                                                          maxElement = numArr[i];
+                                                          maxIndex = i;
+                                                      }else if(numArr[i]< maxElement){
+                                                          swapIdx1 = i;
+                                                          swapIdx2 = maxIndex;
+                                                      }
+                                                  }
+
+
+The loop starts from the second-to-last digit and iterates towards the leftmost digit (i = n-2 to i = 0).
+
+Check if the current digit is greater than maxElement:
+
+If numArr[i] > maxElement: This means the current digit is larger than the maximum digit seen so far to the right of it.
+Update maxElement to the current digit and set maxIndex to the current index i.
+Check if the current digit is smaller than maxElement:
+
+If numArr[i] < maxElement: This means there is a larger digit available on the right side of the current digit, which indicates a potential swap can maximize the number.
+Set swapIdx1 to the current index i (digit to be swapped) and swapIdx2 to maxIndex (index of the largest digit found).
+
+##### 4. Perform the swap (if needed):
+                                                    if(swapIdx1 != -1){
+                                                        char temp = numArr[swapIdx1];
+                                                        numArr[swapIdx1] = numArr[swapIdx2];
+                                                        numArr[swapIdx2] = temp;
+                                                    }
+
+
+If a valid pair of indices for swapping is found (swapIdx1 != -1), then:
+
+Swap the digits at swapIdx1 and swapIdx2 to make the number larger.
+                 
+
+##### 5. Return the new number:
+                                          
+                                           return Integer.parseInt(new String(numArr));
+
+After the swap (if any), convert the modified character array numArr[] back into a string, and then convert that string to an integer using Integer.parseInt() and return it.
